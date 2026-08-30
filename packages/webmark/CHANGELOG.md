@@ -1,3 +1,10 @@
+# [1.5.0](https://github.com/AnalyticAce/webmark/compare/v1.4.1...v1.5.0) (2026-08-30)
+
+
+### Features
+
+* implement demo site with local storage for comments and update styling ([446e0e4](https://github.com/AnalyticAce/webmark/commit/446e0e476d4625dd1ccbc97877b7737e9e344080))
+
 ## [1.4.1](https://github.com/AnalyticAce/webmark/compare/v1.4.0...v1.4.1) (2026-08-30)
 
 
