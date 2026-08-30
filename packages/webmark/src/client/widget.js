@@ -221,17 +221,17 @@ function positionPins() {
 /* ------------------------------------------------------------- highlighting */
 
 function syncHighlight() {
-  const pickRect = state.picking ? state.target?.getBoundingClientRect() : null;
-  const focus =
-    state.picking
-      ? null
-      : state.notes.find((c) => c.id === (state.activePin ?? state.hovered ?? state.draft?.id));
-  const rect =
-    pickRect ??
-    focus?._el?.getBoundingClientRect() ??
-    (state.draft?.anchor && !state.picking
-      ? (state.draft.node ?? resolveAnchor(state.draft.anchor))?.getBoundingClientRect()
-      : null);
+  const pickRect = state.picking ? (state.target?.getBoundingClientRect() ?? null) : null;
+  // The draft is the thing being worked on, so it outranks a hovered row — including a `hovered`
+  // left behind by a list that collapsed before the pointer ever left it.
+  const draftEl = state.draft?.anchor
+    ? (state.draft.node ?? resolveAnchor(state.draft.anchor))
+    : null;
+  const focusId = state.activePin ?? state.hovered;
+  const focus = focusId ? state.notes.find((c) => c.id === focusId) : null;
+  const rect = state.picking
+    ? pickRect
+    : ((draftEl ?? focus?._el)?.getBoundingClientRect() ?? null);
 
   el.highlight.classList.toggle("on", !!rect);
   if (rect) {
@@ -304,6 +304,7 @@ function hidePopover() {
 
 function compose(draft, body = "") {
   state.draft = draft;
+  state.hovered = null;
   state.expanded = false;
   state.open = true;
   hidePopover();
@@ -568,16 +569,7 @@ async function hydrate() {
   state.others = open.filter((c) => c.route !== route).length;
   state.notes = [];
 
-  for (const comment of open.filter((c) => c.route === route)) {
-    if (!comment.anchor) {
-      state.notes.push(comment);
-      continue;
-    }
-    const node = resolveAnchor(comment.anchor);
-    if (!node) {
-      api.remove(comment.id).catch(() => {});
-      continue;
-    }
+  const attach = (comment, node) => {
     comment._el = node;
     const selector = describe(node).selector;
     if (selector !== comment.anchor.selector) {
@@ -585,7 +577,33 @@ async function hydrate() {
       api.patch(comment.id, { anchor: comment.anchor }).catch(() => {});
     }
     state.notes.push(comment);
+  };
+
+  const pending = [];
+  for (const comment of open.filter((c) => c.route === route)) {
+    if (!comment.anchor) {
+      state.notes.push(comment);
+      continue;
+    }
+    const node = resolveAnchor(comment.anchor);
+    if (node) attach(comment, node);
+    else pending.push(comment);
   }
+  refresh();
+
+  // Anything still unresolved gets a grace period before it is collected. We can run before the
+  // app has rendered, and an element that is not on the page *yet* is not an element the agent
+  // deleted — without this, one slow first paint drops every comment on the route.
+  for (let attempt = 0; attempt < 6 && pending.length; attempt++) {
+    await new Promise((done) => setTimeout(done, 250));
+    for (let i = pending.length - 1; i >= 0; i--) {
+      const node = resolveAnchor(pending[i].anchor);
+      if (!node) continue;
+      attach(pending[i], node);
+      pending.splice(i, 1);
+    }
+  }
+  for (const comment of pending) api.remove(comment.id).catch(() => {});
 
   if (state.addressed.length) state.open = true;
   refresh();
@@ -635,7 +653,7 @@ export function mount() {
       syncHighlight();
     }
   });
-  root.addEventListener("mouseleave", () => {
+  el.list.addEventListener("mouseleave", () => {
     state.hovered = null;
     syncHighlight();
   });

@@ -135,11 +135,14 @@ export function describe(el) {
  */
 export function resolveAnchor(anchor) {
   if (!anchor) return null;
-  const matches = (n) =>
-    !!n &&
-    !isOurs(n) &&
-    labelFor(n) === anchor.label &&
-    (!anchor.component || reactInfoFor(n).component === anchor.component);
+  const matches = (n) => {
+    if (!n || isOurs(n) || labelFor(n) !== anchor.label) return false;
+    if (!anchor.component) return true;
+    // `hydrate` can run before React has attached its fibers, and a component we cannot read yet
+    // is not evidence of a mismatch — treating it as one deletes every comment on the page.
+    const found = reactInfoFor(n).component;
+    return !found || found === anchor.component;
+  };
 
   let el = null;
   try {
