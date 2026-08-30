@@ -44,3 +44,4 @@ next-env.d.ts
 
 # webmark review comments (local only)
 .webmark/
+graphify-out/

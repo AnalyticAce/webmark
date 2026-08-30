@@ -1,81 +1,126 @@
 # webmark
 
-Point-and-comment review layer for the page your coding agent just built. You review in the
-browser; your agent picks the comments up from a file and makes the changes.
+[![npm](https://img.shields.io/npm/v/@dshalom/webmark)](https://www.npmjs.com/package/@dshalom/webmark)
+[![license](https://img.shields.io/npm/l/@dshalom/webmark)](LICENSE)
 
-Solo and local by design: no account, no hosted service, nothing leaves your machine.
+**Point at what's wrong on the page. Your coding agent picks it up and fixes it.**
 
-## Layout
+Your agent builds a page. You open it, click the headline, and type *"this promise is vague."*
+The comment lands in a file your agent reads, with the route, the component, and the exact text
+you pointed at. It makes the change, and the pin disappears on its own.
 
-| Path | What it is |
-| --- | --- |
-| [`packages/webmark`](packages/webmark) | The tool itself — dev-only widget, local comment store, CLI |
-| `src/` | A bare Next.js page used as the fixture to build and test it against |
+No account, no hosted service, nothing leaves your machine. It runs in development only and
+cannot reach a production build.
 
-## Try it
+---
 
-```bash
-npm install && npm run dev
-```
+## Install
 
-Open http://localhost:3000. Press `T` to pick an element, `C` for a general note. Then:
-
-```bash
-npx webmark list
-```
-
-## Installing it in another project
+Requires **Next.js 15.3+** (App Router) and **Node 20+**.
 
 ```bash
 npm i -D @dshalom/webmark && npx webmark init
 ```
 
-See [the package README](packages/webmark/README.md) for the full command set, the rules that
-decide when a comment survives a reload, and how it stays out of production builds.
+Restart your dev server. A dark pill appears in the bottom-right corner.
 
-## Releasing
+`init` prints every file it touches — two small instrumentation files, one line in
+`.gitignore`, and a section in `AGENTS.md` telling your agent how to use the comments.
 
-[semantic-release](https://semantic-release.gitbook.io/) owns versioning, tagging, the changelog,
-the GitHub release, and the npm publish. You never edit a version number or write a tag.
+## Leave a comment
 
-| Commit on `main` | Result |
+| Key | What it does |
 | --- | --- |
-| `feat: …` | minor |
-| `fix: …`, `perf: …` | patch |
-| `feat!: …` or a `BREAKING CHANGE:` footer | major |
-| `docs`, `chore`, `ci`, `test`, `refactor`, `style` | no release |
+| `T` | Pick an element — the page dims, hover to highlight, click to attach |
+| `C` | Write a note with no anchor |
+| `⌥` + scroll | While picking, widen or narrow the selection |
+| `⌘` + `↵` | Save |
+| `Esc` | Back out one step |
 
-Push to `main`, CI verifies, then semantic-release analyses the commits, bumps
-`packages/webmark/package.json`, writes `packages/webmark/CHANGELOG.md`, commits both as
-`chore(release): X.Y.Z [skip ci]`, tags it, publishes to npm, and opens a GitHub release with
-generated notes. Configuration lives in [`.releaserc.json`](.releaserc.json).
+Everything is also clickable: the pill has buttons for both, and the panel lists what you've
+written so far.
 
-**Every releasable commit on `main` ships a version**, including one that only touches the demo
-app — semantic-release has no path filter. Keep non-package work under `chore:` / `docs:` /
-`refactor:`, or add `semantic-release-monorepo` if that becomes a nuisance.
+Each anchored comment gets a numbered pin on the element's corner. **Hover a pin** to read the
+note, edit it, or delete it. Hover a row in the panel and the element lights up on the page.
 
-Preview what the next push would release:
+## Hand it to your agent
 
-```bash
-npx semantic-release --dry-run --no-ci
+Click **Copy for agent** in the panel and paste into Claude Code, Cursor, Aider — anything that
+can read a file. Or just say *"pick up the review."* `init` already wrote the instructions into
+your `AGENTS.md`.
+
+Your agent reads `.webmark/comments.json`, which gives it enough to find the code without
+guessing:
+
+```
+### c_xeogb96781
+Tighten this to one sentence.
+
+- route: /
+- element: <h3> "A human reviews"
+- component: CardContent < Card < Home
+- selector: div:nth-of-type(1) > div:nth-of-type(2) > div > h3
 ```
 
-### Publishing credentials
+The route narrows it to a file, the component chain names what rendered it, and the quoted text
+is usually a single grep away. When it's done, it marks the comment addressed:
 
-CI publishes through **npm trusted publishing** — GitHub Actions mints an OIDC token, npm
-exchanges it for a short-lived publish token, and nothing long-lived is stored in the repo. It
-also works with 2FA set to *auth-and-writes*, which no static token can satisfy.
+```bash
+npx webmark resolve c_xeogb96781 --note "shortened to one sentence"
+```
 
-Setting it up, once:
+## How comments live and die
 
-1. The package must exist on npm first, so publish the initial version by hand (this is the
-   only time you enter an OTP): `cd packages/webmark && npm publish --access public`
-2. On npmjs.com → the package → Settings → Trusted Publisher → GitHub Actions, with repository
-   `AnalyticAce/webmark` and workflow `ci.yml`.
-3. Once one release has gone through on OIDC, delete the `NPM_TOKEN` secret.
-   `@semantic-release/npm` tries OIDC first and only falls back to a token, so it is dead
-   weight — and a long-lived publish token in repo secrets is what 2FA exists to prevent.
+A comment survives a reload only while it is **unresolved** and the thing it points at **still
+renders with the same text**.
 
-Every push and pull request runs the same verification the release does: syntax check, types,
-lint, a production build of the demo app, a guard that the widget never reaches that bundle, and
-a dry-run pack.
+Change the copy, delete the component, move it to another page — the comment goes with it. So
+when your agent addresses your feedback, the pins clean themselves up while you watch. Nothing
+to tick off, no stale annotations piling up.
+
+Resolved comments appear once as an **"addressed"** strip with your agent's notes, then drop.
+
+## Commands
+
+| Command | What it does |
+| --- | --- |
+| `npx webmark init` | Wires the widget into a Next.js app |
+| `npx webmark list [--all] [--json]` | Prints open comments |
+| `npx webmark resolve <id> --note "…"` | Marks one addressed |
+| `npx webmark eject` | Removes every trace of it |
+
+## Uninstall
+
+```bash
+npx webmark eject && npm rm -D @dshalom/webmark
+```
+
+`eject` reverses `init` exactly: instrumentation files removed, `.gitignore` and `AGENTS.md`
+restored, `.webmark/` deleted. The diff is empty, because the widget never lived in your
+component tree.
+
+## Is it safe to leave installed?
+
+- **Development only.** Both the widget and its comment store are behind
+  `NODE_ENV === "development"`, so neither exists in a production build. CI enforces this on
+  every commit.
+- **Local only.** The store binds to `127.0.0.1`, accepts requests from localhost pages only,
+  and writes to exactly one gitignored file inside your project.
+- **Out of your way.** The widget mounts in a shadow root with its own overlay, so it can't
+  inherit your styles, re-render with your app, or intercept a click meant for your page.
+
+---
+
+## This repo
+
+| Path | What it is |
+| --- | --- |
+| [`packages/webmark`](packages/webmark) | The published package |
+| `src/` | A small Next.js page used as the fixture to develop and test it against |
+
+```bash
+npm install && npm run dev
+```
+
+Contributing, the release process, and CI are documented in
+[CONTRIBUTING.md](CONTRIBUTING.md).
