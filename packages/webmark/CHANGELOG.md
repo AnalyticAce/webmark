@@ -1,3 +1,10 @@
+## [1.4.1](https://github.com/AnalyticAce/webmark/compare/v1.4.0...v1.4.1) (2026-08-30)
+
+
+### Bug Fixes
+
+* improve anchor resolution logic and enhance highlight synchronization in widget ([e53b6bc](https://github.com/AnalyticAce/webmark/commit/e53b6bc0d6dc8fa68e634d922730446dbe0d31fa))
+
 # [1.4.0](https://github.com/AnalyticAce/webmark/compare/v1.3.0...v1.4.0) (2026-08-30)
 
 

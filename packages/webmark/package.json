@@ -1,6 +1,6 @@
 {
   "name": "@dshalom/webmark",
-  "version": "1.4.0",
+  "version": "1.4.1",
   "description": "Point-and-comment review layer for the page your agent just built. Dev-only, local-only.",
   "keywords": [
     "review",
