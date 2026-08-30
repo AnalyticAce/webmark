@@ -309,6 +309,7 @@ function compose(draft, body = "") {
   hidePopover();
   el.textarea.value = body;
   syncPanel();
+  el.textarea.focus();
   requestAnimationFrame(() => el.textarea.focus());
 }
 
@@ -538,7 +539,7 @@ function onKey(e) {
     save();
     return;
   }
-  if (typing || e.metaKey || e.ctrlKey || e.altKey) return;
+  if (typing || state.draft || e.metaKey || e.ctrlKey || e.altKey) return;
   if (e.key.toLowerCase() === "c") compose({});
   if (e.key.toLowerCase() === "t") startPicking();
 }

@@ -42,7 +42,8 @@ next-env.d.ts
 
 .npmrc
 
-# webmark review comments (local only)
-.webmark/
 graphify-out/
 .claude/
+
+# webmark review comments (local only)
+.webmark/
