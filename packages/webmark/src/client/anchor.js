@@ -4,6 +4,25 @@ export function isOurs(el) {
   return !el || el.tagName === HOST_TAG.toUpperCase() || !!el.closest?.(HOST_TAG);
 }
 
+const trunc = (s) => (s.length > 40 ? `${s.slice(0, 40)}…` : s);
+
+/** The on-screen text that names a field, which renders none of its own. */
+function nameOf(el) {
+  const labelled = el.id
+    ? document.querySelector(`label[for="${CSS.escape(el.id)}"]`)
+    : el.closest?.("label");
+  return (
+    el.getAttribute?.("aria-label") ||
+    labelled?.textContent?.trim() ||
+    el.getAttribute?.("placeholder") ||
+    el.getAttribute?.("title") ||
+    el.getAttribute?.("alt") ||
+    el.getAttribute?.("name") ||
+    el.id ||
+    null
+  );
+}
+
 /** First meaningful line of an element's rendered text — the identity a human recognises. */
 export function labelFor(el) {
   const raw = el instanceof HTMLElement ? el.innerText : el.textContent;
@@ -11,8 +30,11 @@ export function labelFor(el) {
     .split("\n")
     .map((l) => l.trim())
     .find((l) => l.length > 2);
-  if (!line) return el.tagName.toLowerCase();
-  return line.length > 40 ? `${line.slice(0, 40)}…` : line;
+  if (line) return trunc(line);
+  // Falling back to the tag name gives every field on the page the same identity ("input"), so
+  // two of them are indistinguishable and both comments get dropped as ambiguous on reload.
+  const named = nameOf(el);
+  return named ? trunc(named.trim()) : el.tagName.toLowerCase();
 }
 
 /** Full path from body. Used to draw the pin, never to decide whether a comment survives. */

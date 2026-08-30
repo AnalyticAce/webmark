@@ -401,12 +401,22 @@ function targetAt(x, y) {
   return node && !isOurs(node) ? node : null;
 }
 
+// While picking, the page must not react to the pointer at all. A mousedown on a field focuses
+// it, and then everything typed into the composer lands in the app's form instead of the note.
+function swallowPointer(e) {
+  if (isOurs(e.target)) return;
+  e.preventDefault();
+  e.stopPropagation();
+}
+
 function startPicking() {
   if (state.picking) return;
   state.picking = true;
   document.body.style.cursor = "crosshair";
   document.addEventListener("mousemove", onPickMove, true);
   document.addEventListener("wheel", onPickWheel, { passive: false, capture: true });
+  document.addEventListener("mousedown", swallowPointer, true);
+  document.addEventListener("mouseup", swallowPointer, true);
   document.addEventListener("click", onPickClick, true);
   syncPanel();
 }
@@ -418,6 +428,8 @@ function stopPicking() {
   document.body.style.cursor = "";
   document.removeEventListener("mousemove", onPickMove, true);
   document.removeEventListener("wheel", onPickWheel, true);
+  document.removeEventListener("mousedown", swallowPointer, true);
+  document.removeEventListener("mouseup", swallowPointer, true);
   document.removeEventListener("click", onPickClick, true);
   syncPanel();
   syncHighlight();
