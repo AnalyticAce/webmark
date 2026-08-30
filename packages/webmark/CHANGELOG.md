@@ -1,3 +1,10 @@
+# [1.3.0](https://github.com/AnalyticAce/webmark/compare/v1.2.0...v1.3.0) (2026-08-30)
+
+
+### Features
+
+* enhance element identification and pointer event handling during picking ([6e40397](https://github.com/AnalyticAce/webmark/commit/6e403973a62c784f9d215f6c4108d36dd0eba74e))
+
 # [1.2.0](https://github.com/AnalyticAce/webmark/compare/v1.1.0...v1.2.0) (2026-08-30)
 
 
