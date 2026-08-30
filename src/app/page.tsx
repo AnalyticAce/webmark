@@ -59,8 +59,13 @@ export default function Home() {
           </a>
           <a
             href="https://www.npmjs.com/package/@dshalom/webmark"
-            className="text-[13px] text-paper-dim transition-colors duration-150 hover:text-acid"
+            className="flex items-center gap-1.5 text-[13px] text-paper-dim transition-colors duration-150 hover:text-acid"
           >
+            <svg aria-hidden viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/>
+              <polyline points="3.27 6.96 12 12.01 20.73 6.96"/>
+              <line x1="12" y1="22.08" x2="12" y2="12"/>
+            </svg>
             npm
           </a>
         </nav>
@@ -69,7 +74,7 @@ export default function Home() {
       <main className="flex-1">
         {/* ---------------------------------------------------------------- hero */}
         <section className="mx-auto max-w-[1180px] px-6 pt-24 pb-20 md:pt-36">
-          <p className="eyebrow rise">Dev only · Local only · No account</p>
+          <p className="eyebrow rise text-center">Dev only · Local only · No account</p>
 
           <h1 className="rise mt-7 mx-auto max-w-[16ch] font-display text-[clamp(3.25rem,9vw,6.75rem)] leading-[0.92] tracking-[-0.02em] text-balance text-center [animation-delay:80ms]">
             Point at what&apos;s wrong.{" "}
@@ -83,7 +88,7 @@ export default function Home() {
             at. It makes the change, and the pin disappears on its own.
           </p>
 
-          <div className="rise mt-11 flex flex-col items-center gap-4 sm:flex-row sm:justify-center [animation-delay:240ms]">
+          <div className="rise mt-11 flex flex-col items-center gap-4 [animation-delay:240ms]">
             <CopyCommand command="npm i -D @dshalom/webmark && npx webmark init" />
             <a
               href="#how"
@@ -93,24 +98,25 @@ export default function Home() {
             </a>
           </div>
 
-          {/* The page is the demo — say so, next to the thing itself. */}
-          <aside className="rise mt-16 flex flex-wrap items-center gap-x-3 gap-y-2 border-l-2 border-acid-deep py-1 pl-5 text-[14px] text-paper-dim [animation-delay:320ms]">
-            <strong className="font-medium text-paper">This page is the demo.</strong>
-            <span>
-              The real widget is running bottom-right. Press
-              <Key>T</Key> and click anything, or
-              <Key>C</Key> for a note with no anchor.
-            </span>
-            <span className="text-paper-faint">
-              Comments stay in this browser — nothing is sent anywhere.
-            </span>
-          </aside>
         </section>
 
         {/* ------------------------------------------------------------ the shot */}
         <section className="mx-auto max-w-[1180px] px-6 pb-28">
           <ProductShot />
         </section>
+
+        {/* The page is the demo — say so, below the shot. */}
+        <aside className="mx-auto max-w-[1180px] px-6 pb-16 flex flex-wrap items-center gap-x-3 gap-y-2 border-l-2 border-acid-deep py-1 pl-5 text-[14px] text-paper-dim">
+          <strong className="font-medium text-paper">This page is the demo.</strong>
+          <span>
+            The real widget is running bottom-right. Press
+            <Key>T</Key> and click anything, or
+            <Key>C</Key> for a note with no anchor.
+          </span>
+          <span className="text-paper-faint">
+            Comments stay in this browser — nothing is sent anywhere.
+          </span>
+        </aside>
 
         {/* ------------------------------------------------------------ how it works */}
         <section id="how" className="border-y border-rule-soft bg-ink-2/60">
@@ -276,7 +282,7 @@ function ProductShot() {
         <span className="ml-3 text-[12px] text-paper-faint">localhost:3000</span>
       </div>
 
-      <div className="relative grid gap-8 p-8 sm:p-12 lg:grid-cols-[minmax(0,1fr)_300px]">
+      <div className="relative grid gap-8 p-8 sm:p-12 lg:grid-cols-[minmax(0,1fr)_360px]">
         {/* the app being reviewed */}
         <div className="space-y-5">
           <Pinned n={1}>
@@ -297,20 +303,86 @@ function ProductShot() {
           </Pinned>
         </div>
 
-        {/* the note the reviewer left */}
-        <aside className="self-start rounded-xl border border-rule bg-surface p-5">
-          <div className="flex items-center gap-2.5">
-            <span className="flex size-[22px] items-center justify-center rounded-[7px_7px_7px_2px] bg-acid text-[11px] font-semibold text-on-acid tabular-nums">
-              1
-            </span>
-            <span className="text-[12px] text-paper-faint">on &lt;h3&gt;</span>
+        {/* widget panel — exact markup and CSS from widget.js / styles.js */}
+        <aside className="wm-snap self-start">
+          <style>{`
+            .wm-snap {
+              --accent:#c4d600; --on-accent:#0f0f0d;
+              --panel-bg:#1c1c18; --panel-border:#3a3a34; --panel-elev:#26261f;
+              --hairline:#26261f; --muted:#a8a89e; --faint:#8f8f84; --bar-fg:#e8e8e2;
+              --chip-bg:#26261f; --chip-text:#a8a89e; --accent-tint:#2c3010;
+              --shadow:0 12px 36px rgba(0,0,0,.55);
+              --ease:cubic-bezier(.2,.9,.3,1);
+              font-family:ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;
+              -webkit-font-smoothing:antialiased;
+              color:var(--bar-fg);
+              width:min(360px,100%); display:flex; flex-direction:column; overflow:hidden;
+              border-radius:16px; background:var(--panel-bg); border:1px solid var(--panel-border);
+              box-shadow:var(--shadow);
+            }
+            .wm-snap *,.wm-snap *::before,.wm-snap *::after{box-sizing:border-box}
+            .wm-snap button{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:pointer}
+            .wm-snap .header{display:flex;align-items:center;gap:8px;padding:14px 16px 8px;flex:none}
+            .wm-snap .header h2{font-size:14px;font-weight:600;letter-spacing:-.01em}
+            .wm-snap .count{display:inline-flex;align-items:center;justify-content:center;min-width:18px;height:18px;padding:0 6px;border-radius:999px;font-size:11px;font-weight:700;font-variant-numeric:tabular-nums}
+            .wm-snap .count.soft{background:var(--accent-tint);color:var(--accent)}
+            .wm-snap .spacer{flex:1}
+            .wm-snap .iconbtn{display:inline-flex;align-items:center;justify-content:center;width:28px;height:28px;border-radius:8px;color:var(--faint)}
+            .wm-snap ul{list-style:none;padding:0;margin:0}
+            .wm-snap .list{border-top:1px solid var(--hairline)}
+            .wm-snap .item{padding:12px 16px;border-bottom:1px solid var(--hairline)}
+            .wm-snap .item:last-child{border-bottom:0}
+            .wm-snap .item-top{display:flex;align-items:flex-start;gap:10px}
+            .wm-snap .badge{display:inline-flex;align-items:center;justify-content:center;flex:none;width:22px;height:22px;margin-top:1px;border-radius:999px;background:var(--accent);color:var(--on-accent);font-size:11px;font-weight:700;font-variant-numeric:tabular-nums}
+            .wm-snap .item-body{flex:1;min-width:0}
+            .wm-snap .item-text{font-size:13.5px;line-height:1.35;word-break:break-word}
+            .wm-snap .item-chip{display:inline-block;max-width:100%;margin-top:6px;padding:2px 8px;border-radius:999px;background:var(--chip-bg);color:var(--chip-text);font-size:11.5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;vertical-align:bottom}
+            .wm-snap .footer{display:flex;align-items:center;gap:8px;height:44px;padding:0 12px;flex:none;border-top:1px solid var(--hairline);font-size:12.5px}
+            .wm-snap .footer button{white-space:nowrap;color:var(--muted);border-radius:999px;height:28px;padding:0 10px}
+            .wm-snap .toggle{display:inline-flex;align-items:center;gap:6px}
+            .wm-snap .chev{display:inline-flex}
+          `}</style>
+
+          <div className="header">
+            <h2>Review</h2>
+            <span className="count soft">1</span>
+            <span className="spacer" />
+            <button className="iconbtn" aria-label="Close review panel">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><line x1="6" y1="6" x2="18" y2="18"/><line x1="18" y1="6" x2="6" y2="18"/></svg>
+            </button>
           </div>
-          <p className="mt-3.5 text-[14px] leading-[1.6] text-paper">
-            This promise is vague — say what it actually does.
-          </p>
-          <div className="mt-4 flex items-center gap-2 border-t border-rule-soft pt-3.5 text-[11px] text-paper-faint">
-            <span className="truncate">Hero &lt; LandingPage</span>
-            <span className="ml-auto shrink-0 text-acid-deep">unresolved</span>
+
+          <ul className="list">
+            <li className="item">
+              <div className="item-top">
+                <span className="badge">1</span>
+                <div className="item-body">
+                  <div className="item-text">This promise is vague — say what it actually does.</div>
+                  <span className="item-chip">&lt;h3&gt; &quot;The only checkout…&quot;</span>
+                </div>
+                <button className="iconbtn" aria-label="Edit note 1">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5z"/></svg>
+                </button>
+                <button className="iconbtn" aria-label="Delete note 1">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M3 6h18"/><path d="M8 6V4a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1v2"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg>
+                </button>
+              </div>
+            </li>
+          </ul>
+
+          <div className="footer">
+            <button className="toggle">
+              <span className="chev">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
+              </span>
+              <span>Show 1 comment</span>
+            </button>
+            <span className="spacer" />
+            <button className="toggle">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg>
+              <span>Copy</span>
+            </button>
+            <button>Delete all</button>
           </div>
         </aside>
       </div>

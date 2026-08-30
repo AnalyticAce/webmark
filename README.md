@@ -1,5 +1,7 @@
 # webmark
 
+![webmark hero](public/hero.png)
+
 [![npm](https://img.shields.io/npm/v/@dshalom/webmark)](https://www.npmjs.com/package/@dshalom/webmark)
 [![license](https://img.shields.io/npm/l/@dshalom/webmark)](LICENSE)
 
