@@ -83,6 +83,7 @@ button:focus-visible, textarea:focus-visible { outline: 2px solid var(--accent);
 .pin {
   position: absolute; display: inline-flex; align-items: center; justify-content: center;
   min-width: 22px; height: 22px; padding: 0 6px; pointer-events: auto;
+  z-index: 1;
   border-radius: 8px 8px 8px 3px; background: var(--accent); color: var(--on-accent);
   box-shadow: 0 0 0 1px var(--pin-ring), var(--pin-shadow);
   font-size: 12px; font-weight: 700; font-variant-numeric: tabular-nums;
@@ -93,6 +94,7 @@ button:focus-visible, textarea:focus-visible { outline: 2px solid var(--accent);
 /* ---------- popover ---------- */
 .popover {
   position: absolute; width: 264px; pointer-events: auto; padding: 14px;
+  z-index: 2;
   border-radius: 16px; background: var(--panel-bg); border: 1px solid var(--panel-border);
   box-shadow: var(--shadow); animation: pop .16s var(--ease);
 }

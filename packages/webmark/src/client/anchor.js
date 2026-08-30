@@ -15,26 +15,28 @@ export function labelFor(el) {
   return line.length > 40 ? `${line.slice(0, 40)}…` : line;
 }
 
-/** Shortest-ish CSS path. Used to draw the pin, never to decide whether a comment survives. */
+/** Full path from body. Used to draw the pin, never to decide whether a comment survives. */
 export function selectorFor(el) {
   const parts = [];
   let node = el;
-  while (node && node !== document.body && parts.length < 4) {
+  while (node && node !== document.body) {
     if (node.id) {
       parts.unshift(`#${CSS.escape(node.id)}`);
-      break;
+      return parts.join(" > ");
     }
     const parent = node.parentElement;
     const tag = node.tagName.toLowerCase();
     if (!parent) {
       parts.unshift(tag);
-      break;
+      return parts.join(" > ");
     }
     const twins = [...parent.children].filter((c) => c.tagName === node.tagName);
     parts.unshift(twins.length > 1 ? `${tag}:nth-of-type(${twins.indexOf(node) + 1})` : tag);
     node = parent;
   }
-  return parts.join(" > ");
+  // Rooted at body on purpose: a relative path matches the first such element anywhere in the
+  // document, which is rarely the one that was picked.
+  return parts.length ? `body > ${parts.join(" > ")}` : "body";
 }
 
 /** Framework plumbing that would be noise (or a lie) in a comment. */
@@ -111,19 +113,20 @@ export function describe(el) {
  */
 export function resolveAnchor(anchor) {
   if (!anchor) return null;
+  const matches = (n) =>
+    !!n &&
+    !isOurs(n) &&
+    labelFor(n) === anchor.label &&
+    (!anchor.component || reactInfoFor(n).component === anchor.component);
+
   let el = null;
   try {
     el = anchor.selector ? document.querySelector(anchor.selector) : null;
   } catch {
     el = null;
   }
-  if (el && !isOurs(el) && labelFor(el) === anchor.label) return el;
+  if (matches(el)) return el;
 
-  const candidates = [...document.body.querySelectorAll(anchor.tag || "*")].filter(
-    (n) =>
-      !isOurs(n) &&
-      labelFor(n) === anchor.label &&
-      (!anchor.component || reactInfoFor(n).component === anchor.component),
-  );
+  const candidates = [...document.body.querySelectorAll(anchor.tag || "*")].filter(matches);
   return candidates.length === 1 ? candidates[0] : null;
 }

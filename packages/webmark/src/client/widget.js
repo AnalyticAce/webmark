@@ -19,6 +19,7 @@ const state = {
   activePin: null,
   hovered: null,
   confirm: null, // comment id, or "all"
+  sticky: false, // popover opened by a click — survives the pointer leaving
 };
 
 let root; // shadow root
@@ -229,7 +230,7 @@ function syncHighlight() {
     pickRect ??
     focus?._el?.getBoundingClientRect() ??
     (state.draft?.anchor && !state.picking
-      ? resolveAnchor(state.draft.anchor)?.getBoundingClientRect()
+      ? (state.draft.node ?? resolveAnchor(state.draft.anchor))?.getBoundingClientRect()
       : null);
 
   el.highlight.classList.toggle("on", !!rect);
@@ -283,13 +284,16 @@ function placePopover() {
   const rect = note?._el?.getBoundingClientRect();
   if (!rect) return hidePopover();
   const box = el.popover.getBoundingClientRect();
-  const below = rect.bottom + 8 + box.height < window.innerHeight;
-  el.popover.style.top = `${below ? rect.bottom + 8 : Math.max(8, rect.top - box.height - 8)}px`;
-  el.popover.style.left = `${Math.max(8, Math.min(rect.left, window.innerWidth - box.width - 8))}px`;
+  // Touching the pin (top-right corner of the element), not the element's far edge — the pointer
+  // has to be able to travel from pin to popover without ever leaving the widget.
+  const below = rect.top + 10 + box.height < window.innerHeight;
+  el.popover.style.top = `${below ? rect.top + 10 : Math.max(8, rect.top - box.height - 10)}px`;
+  el.popover.style.left = `${Math.max(8, Math.min(rect.right - 11, window.innerWidth - box.width - 8))}px`;
 }
 
 function hidePopover() {
   state.activePin = null;
+  state.sticky = false;
   el.popover.hidden = true;
   if (state.confirm !== "all") state.confirm = null;
   syncHighlight();
@@ -321,7 +325,7 @@ function closePanel() {
 async function save() {
   const text = el.textarea.value.trim();
   if (!text || !state.draft) return;
-  const { id, anchor } = state.draft;
+  const { id, anchor, node } = state.draft;
   try {
     if (id) {
       const updated = await api.patch(id, { text });
@@ -335,7 +339,8 @@ async function save() {
         url: location.href,
         viewport: { w: window.innerWidth, h: window.innerHeight },
       });
-      created._el = anchor ? resolveAnchor(anchor) : null;
+      // The picked node beats a fresh lookup: it is the element the human actually clicked.
+      created._el = anchor ? (node ?? resolveAnchor(anchor)) : null;
       state.notes.push(created);
     }
   } catch (err) {
@@ -438,7 +443,7 @@ function onPickClick(e) {
   e.stopPropagation();
   const anchor = describe(node);
   stopPicking();
-  compose({ ...(state.draft ?? {}), anchor }, el.textarea.value);
+  compose({ ...(state.draft ?? {}), anchor, node }, el.textarea.value);
 }
 
 /* -------------------------------------------------------------------- wiring */
@@ -476,7 +481,7 @@ function onAction(e) {
     "clear-yes": clearAll,
     edit: () => {
       const note = state.notes.find((c) => c.id === id);
-      if (note) compose({ id: note.id, anchor: note.anchor }, note.text);
+      if (note) compose({ id: note.id, anchor: note.anchor, node: note._el }, note.text);
     },
     "ask-delete": () => {
       state.confirm = id;
@@ -498,7 +503,10 @@ function onAction(e) {
 }
 
 function onKey(e) {
-  const typing = e.target.matches?.("input, textarea, [contenteditable]");
+  // A shadow root retargets `e.target` to the host, so our own textarea would read as the page
+  // and every typed "t" would open the picker mid-sentence. Ask for the real source instead.
+  const source = e.composedPath?.()[0] ?? e.target;
+  const typing = !!source?.matches?.("input, textarea, [contenteditable]");
   if (e.key === "Escape") {
     if (state.picking) stopPicking();
     else if (state.confirm) {
@@ -619,11 +627,33 @@ export function mount() {
     syncHighlight();
   });
   el.popover.addEventListener("mouseleave", (e) => {
-    if (!e.relatedTarget?.closest?.(".pin")) hidePopover();
+    if (!state.sticky && !e.relatedTarget?.closest?.(".pin")) hidePopover();
   });
   el.pins.addEventListener("mouseleave", (e) => {
-    if (!e.relatedTarget?.closest?.(".popover")) hidePopover();
+    if (!state.sticky && !e.relatedTarget?.closest?.(".popover")) hidePopover();
   });
+
+  // Clicking a commented element opens its note and keeps it open, so the pin — 22px in a corner
+  // — is not the only way to reach Edit. Capture-phase and never cancelled: the app still works.
+  document.addEventListener(
+    "click",
+    (e) => {
+      if (state.picking) return;
+      const node = e.composedPath?.()[0] ?? e.target;
+      if (isOurs(node)) return;
+      let hit = null;
+      for (let n = node; n && n !== document.body && !hit; n = n.parentElement) {
+        hit = state.notes.find((c) => c._el === n) ?? null;
+      }
+      if (hit) {
+        state.sticky = true;
+        showPopover(hit.id);
+      } else if (state.sticky) {
+        hidePopover();
+      }
+    },
+    true,
+  );
   el.textarea.addEventListener("input", () => (el.save.disabled = !el.textarea.value.trim()));
 
   window.addEventListener("keydown", onKey);
