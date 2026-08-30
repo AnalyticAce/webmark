@@ -1,3 +1,11 @@
+# [1.4.0](https://github.com/AnalyticAce/webmark/compare/v1.3.0...v1.4.0) (2026-08-30)
+
+
+### Features
+
+* update .gitignore, enhance AGENTS.md documentation, and upgrade @dshalom/webmark to version 1.3.0; improve widget focus handling ([97c6a59](https://github.com/AnalyticAce/webmark/commit/97c6a59572636969f3982b5f1c3b9580f7242442))
+* update @dshalom/webmark dependency to local file reference and add TypeScript definitions for client and server ([fa353d3](https://github.com/AnalyticAce/webmark/commit/fa353d3d56e8006ca569ff720b22798ca57a3871))
+
 # [1.3.0](https://github.com/AnalyticAce/webmark/compare/v1.2.0...v1.3.0) (2026-08-30)
 
 
