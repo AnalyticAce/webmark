@@ -1,0 +1,47 @@
+{
+  "name": "@dshalom/webmark",
+  "version": "0.0.0-development",
+  "description": "Point-and-comment review layer for the page your agent just built. Dev-only, local-only.",
+  "keywords": [
+    "review",
+    "comments",
+    "annotation",
+    "nextjs",
+    "ai-agents",
+    "coding-agent",
+    "devtools",
+    "feedback"
+  ],
+  "license": "MIT",
+  "author": "Shalom Dosseh <dossehdosseh14@gmail.com>",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/AnalyticAce/webmark.git",
+    "directory": "packages/webmark"
+  },
+  "homepage": "https://github.com/AnalyticAce/webmark#readme",
+  "bugs": {
+    "url": "https://github.com/AnalyticAce/webmark/issues"
+  },
+  "type": "module",
+  "bin": {
+    "webmark": "src/cli/index.js"
+  },
+  "exports": {
+    "./client": "./src/client/index.js",
+    "./server": "./src/server/index.js",
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "src",
+    "README.md",
+    "LICENSE",
+    "CHANGELOG.md"
+  ],
+  "engines": {
+    "node": ">=20"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}

@@ -1,0 +1,26 @@
+@import "tailwindcss";
+
+/* Tokens for the demo page. The review widget carries its own copy inside its shadow root,
+   so it can never inherit or clash with a host app's styles. */
+@theme {
+  --font-sans: var(--font-inter-tight), ui-sans-serif, system-ui, sans-serif;
+
+  --color-accent: #c4d600;
+  --color-accent-hover: #b0c000;
+  --color-on-accent: #0f0f0d;
+  --color-text: #14140f;
+  --color-text-mute: #4a4a44;
+  --color-surface-3: #f4f4f0;
+  --color-band: #6e7c10;
+  --color-band-ink: #1b2003;
+}
+
+@layer base {
+  body {
+    background: #fff;
+    color: var(--color-text);
+  }
+  .dc-heading {
+    letter-spacing: -0.035em;
+  }
+}

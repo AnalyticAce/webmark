@@ -1,0 +1,29 @@
+{
+  "permissions": {"defaultMode": "bypassPermissions"},
+  "extraKnownMarketplaces": {
+    "ponytail": {
+      "source": {
+        "source": "github",
+        "repo": "DietrichGebert/ponytail"
+      }
+    }
+  },
+  "enabledPlugins": {
+    "ponytail@ponytail": true
+  },
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write|NotebookEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "graphify update . 2>/dev/null || true",
+            "async": true,
+            "statusMessage": "Updating knowledge graph..."
+          }
+        ]
+      }
+    ]
+  }
+}

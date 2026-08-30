@@ -1,0 +1,83 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    name: Verify
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+
+      # The package ships plain ESM with no build step, so a syntax gate is the build.
+      - name: Syntax-check the package
+        run: find packages/webmark/src -name '*.js' -print0 | xargs -0 -n1 node --check
+
+      # `next typegen` runs inside the script: LayoutProps and friends are generated,
+      # and a fresh checkout has none of them yet.
+      - name: Types
+        run: npm run typecheck
+
+      - name: Lint
+        run: npm run lint
+
+      # Building the demo app exercises the real install path: init's generated files,
+      # the client import, and the dev-only guard that must strip it from the bundle.
+      - name: Build the demo app
+        run: npx next build
+
+      - name: Assert the widget stays out of the production bundle
+        run: |
+          if grep -rq "webmark-root" .next/static; then
+            echo "::error::review widget leaked into the production bundle"
+            exit 1
+          fi
+
+      - name: Pack
+        run: npm pack --dry-run
+        working-directory: packages/webmark
+
+  release:
+    name: Release
+    needs: verify
+    if: github.event_name != 'pull_request'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write # commit the version bump, push the tag, create the GitHub release
+      issues: write # comment on issues closed by a release
+      pull-requests: write
+      id-token: write # npm trusted publishing: exchange an OIDC token for a publish token
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # semantic-release reads the full history to pick the version
+          persist-credentials: false # it pushes with GITHUB_TOKEN instead
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+
+      # @semantic-release/npm tries OIDC first and only falls back to NPM_TOKEN, so once the
+      # package has a trusted publisher on npmjs.com the secret can be deleted.
+      - name: Release
+        run: npx semantic-release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
