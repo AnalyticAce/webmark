@@ -1,6 +1,11 @@
 {
   "version": "0.0.1",
   "configurations": [
-    { "name": "webmark", "runtimeExecutable": "npm", "runtimeArgs": ["run", "dev"], "port": 3000 }
+    {
+      "name": "demo-pages",
+      "runtimeExecutable": "python3",
+      "runtimeArgs": ["-m", "http.server", "3005", "--directory", "/private/tmp/claude-501/-Users-shalomdosseh-Projects-webmark/698cc6ba-35cb-4a4d-9a32-90954449e36a/scratchpad/pages"],
+      "port": 3005
+    }
   ]
 }

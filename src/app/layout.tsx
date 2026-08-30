@@ -1,24 +1,30 @@
 import type { Metadata } from "next";
-import { Inter_Tight } from "next/font/google";
+import { IBM_Plex_Mono, Instrument_Serif } from "next/font/google";
 import "./globals.css";
 
-const interTight = Inter_Tight({
-  variable: "--font-inter-tight",
+const display = Instrument_Serif({
+  variable: "--font-display",
   subsets: ["latin"],
+  weight: "400",
+  style: ["normal", "italic"],
+});
+
+const mono = IBM_Plex_Mono({
+  variable: "--font-mono-body",
+  subsets: ["latin"],
+  weight: ["300", "400", "500", "600"],
 });
 
 export const metadata: Metadata = {
-  title: "webmark",
-  description: "Point at what is wrong. Your agent picks it up.",
+  title: "webmark — point at what's wrong, your agent fixes it",
+  description:
+    "A dev-only, local-only review layer for the app your agent just built. Click an element, leave a note, hand it to your coding agent. Nothing leaves your machine.",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    <html
-      lang="en"
-      className={`${interTight.variable} h-full antialiased`}
-    >
-      <body className="min-h-full flex flex-col">{children}</body>
+    <html lang="en" className={`${display.variable} ${mono.variable} h-full antialiased`}>
+      <body className="flex min-h-full flex-col">{children}</body>
     </html>
   );
 }

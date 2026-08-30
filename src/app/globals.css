@@ -1,26 +1,156 @@
 @import "tailwindcss";
 
 /* Tokens for the demo page. The review widget carries its own copy inside its shadow root,
-   so it can never inherit or clash with a host app's styles. */
+   so it can never inherit or clash with these. */
 @theme {
-  --font-sans: var(--font-inter-tight), ui-sans-serif, system-ui, sans-serif;
+  --font-sans: var(--font-mono-body), ui-monospace, SFMono-Regular, monospace;
+  --font-display: var(--font-display), ui-serif, Georgia, serif;
 
-  --color-accent: #c4d600;
-  --color-accent-hover: #b0c000;
-  --color-on-accent: #0f0f0d;
-  --color-text: #14140f;
-  --color-text-mute: #4a4a44;
-  --color-surface-3: #f4f4f0;
-  --color-band: #6e7c10;
-  --color-band-ink: #1b2003;
+  --color-ink: #0b0c0a;
+  --color-ink-2: #101208;
+  --color-surface: #14170f;
+  --color-paper: #edefe6;
+  --color-paper-dim: #9aa189;
+  --color-paper-faint: #626855;
+
+  --color-acid: #c4d600;
+  --color-acid-deep: #94a300;
+  /* The only green that clears contrast as text on the white callout. */
+  --color-acid-ink: #46500a;
+  --color-on-acid: #0b0c0a;
+
+  --color-rule: #262a1c;
+  --color-rule-soft: #1b1e14;
 }
 
 @layer base {
-  body {
-    background: #fff;
-    color: var(--color-text);
+  html {
+    scroll-behavior: smooth;
   }
-  .dc-heading {
-    letter-spacing: -0.035em;
+
+  body {
+    background: var(--color-ink);
+    color: var(--color-paper);
+    /* A faint blueprint grid plus a warm bloom behind the fold — atmosphere instead of flat black. */
+    background-image:
+      radial-gradient(80rem 40rem at 70% -10%, rgba(196, 214, 0, 0.09), transparent 60%),
+      linear-gradient(var(--color-rule-soft) 1px, transparent 1px),
+      linear-gradient(90deg, var(--color-rule-soft) 1px, transparent 1px);
+    background-size:
+      100% 100%,
+      64px 64px,
+      64px 64px;
+    background-attachment: fixed;
+  }
+
+  ::selection {
+    background: var(--color-acid);
+    color: var(--color-on-acid);
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-acid);
+    outline-offset: 3px;
+  }
+}
+
+@utility eyebrow {
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--color-paper-faint);
+}
+
+/* One orchestrated page-load reveal; children opt in with a delay. */
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@utility rise {
+  animation: rise 0.7s cubic-bezier(0.2, 0.9, 0.3, 1) both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-delay: 0ms !important;
+    transition-duration: 0.001ms !important;
+  }
+}
+
+/* ---------------------------------------------------------------- loop demo */
+/* One 9s timeline replayed by every part, each phased with its own percentages. Resting styles
+   are the finished frame, so switching the animations off leaves a coherent still. */
+
+@keyframes demo-highlight {
+  0%, 6% { opacity: 0; }
+  12%, 72% { opacity: 1; }
+  80%, 100% { opacity: 0; }
+}
+@keyframes demo-pin {
+  0%, 13% { opacity: 0; transform: scale(0.4); }
+  20%, 74% { opacity: 1; transform: scale(1); }
+  82%, 100% { opacity: 0; transform: scale(0.4); }
+}
+@keyframes demo-panel {
+  0%, 19% { opacity: 0; transform: translateY(12px) scale(0.97); }
+  27%, 60% { opacity: 1; transform: none; }
+  68%, 100% { opacity: 0; transform: translateY(12px) scale(0.97); }
+}
+@keyframes demo-type {
+  0%, 29% { width: 0; }
+  53%, 100% { width: 22ch; }
+}
+@keyframes demo-caret {
+  0%, 28% { opacity: 0; }
+  30%, 56% { opacity: 1; }
+  58%, 100% { opacity: 0; }
+}
+@keyframes demo-saved {
+  0%, 61% { opacity: 0; transform: translateY(6px); }
+  67%, 76% { opacity: 1; transform: none; }
+  84%, 100% { opacity: 0; transform: translateY(6px); }
+}
+
+.demo-highlight,
+.demo-pin,
+.demo-panel,
+.demo-type,
+.demo-caret,
+.demo-saved {
+  animation-duration: 9s;
+  animation-iteration-count: infinite;
+  animation-timing-function: cubic-bezier(0.2, 0.9, 0.3, 1);
+}
+.demo-highlight { animation-name: demo-highlight; }
+.demo-pin { animation-name: demo-pin; }
+.demo-panel { animation-name: demo-panel; }
+.demo-type { animation-name: demo-type; animation-timing-function: steps(22, end); }
+.demo-caret { animation-name: demo-caret; animation-timing-function: steps(1, end); }
+.demo-saved { animation-name: demo-saved; }
+
+@media (prefers-reduced-motion: reduce) {
+  /* Higher specificity than the blanket rule above, which would otherwise snap each part to its
+     final keyframe — and several of those are "invisible". */
+  .demo-highlight,
+  .demo-pin,
+  .demo-panel,
+  .demo-type,
+  .demo-caret,
+  .demo-saved {
+    animation: none !important;
   }
 }
