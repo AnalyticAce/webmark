@@ -157,7 +157,12 @@ function renderAddressed() {
         <button class="iconbtn" data-act="dismiss-addressed" aria-label="Dismiss">${icons.close(13)}</button>
       </div>
       <ul>${state.addressed
-        .map((c) => `<li>${esc(c.resolvedNote || c.text)}</li>`)
+        .map(
+          (c) => `<li class="arow" data-id="${c.id}">
+            <span class="ask">${esc(c.text)}</span>
+            ${c.resolvedNote ? `<span class="done-note">${esc(c.resolvedNote)}</span>` : ""}
+          </li>`,
+        )
         .join("")}</ul>
     </div>`;
 }
@@ -190,20 +195,31 @@ function renderList() {
     .join("");
 }
 
+/** Every comment currently on screen, open or addressed. */
+function noteById(id) {
+  return state.notes.find((c) => c.id === id) ?? state.addressed.find((c) => c.id === id) ?? null;
+}
+
 function renderPins() {
-  el.pins.innerHTML = state.notes
-    .map((c, i) =>
-      c.anchor
-        ? `<button class="pin" data-act="pin" data-id="${c.id}" aria-label="Note ${i + 1}: ${esc(c.text)}">${i + 1}</button>`
-        : "",
-    )
-    .join("");
+  const open = state.notes.map((c, i) =>
+    c.anchor
+      ? `<button class="pin" data-act="pin" data-id="${c.id}" aria-label="Note ${i + 1}: ${esc(c.text)}">${i + 1}</button>`
+      : "",
+  );
+  // An addressed comment keeps its pin, wearing a tick instead of a number. Dropping it outright
+  // made "your agent fixed this" look exactly like "your comment vanished".
+  const done = state.addressed.map((c) =>
+    c.anchor
+      ? `<button class="pin done" data-act="pin" data-id="${c.id}" aria-label="Addressed: ${esc(c.text)}">${icons.check(12)}</button>`
+      : "",
+  );
+  el.pins.innerHTML = [...open, ...done].join("");
   positionPins();
 }
 
 function positionPins() {
   for (const pin of el.pins.children) {
-    const note = state.notes.find((c) => c.id === pin.dataset.id);
+    const note = noteById(pin.dataset.id);
     const rect = note?._el?.getBoundingClientRect();
     if (!rect || (!rect.width && !rect.height)) {
       pin.hidden = true;
@@ -228,7 +244,7 @@ function syncHighlight() {
     ? (state.draft.node ?? resolveAnchor(state.draft.anchor))
     : null;
   const focusId = state.activePin ?? state.hovered;
-  const focus = focusId ? state.notes.find((c) => c.id === focusId) : null;
+  const focus = focusId ? noteById(focusId) : null;
   const rect = state.picking
     ? pickRect
     : ((draftEl ?? focus?._el)?.getBoundingClientRect() ?? null);
@@ -256,12 +272,15 @@ function syncHighlight() {
 
 function showPopover(id) {
   state.activePin = id;
-  const note = state.notes.find((c) => c.id === id);
+  const note = noteById(id);
   if (!note) return hidePopover();
   const i = state.notes.indexOf(note);
   el.popover.hidden = false;
-  el.popover.innerHTML =
-    state.confirm === id
+  el.popover.innerHTML = note.resolved
+    ? `<div class="done-head">${icons.check(13)}<span>Addressed</span></div>
+       <p class="ask">${esc(note.text)}</p>
+       ${note.resolvedNote ? `<p class="done-note">${esc(note.resolvedNote)}</p>` : ""}`
+    : state.confirm === id
       ? `<div class="confirm-title">Delete this note?</div>
          <div class="confirm-sub">The pin will be removed from the page.</div>
          <div class="confirm-row">
@@ -280,7 +299,7 @@ function showPopover(id) {
 }
 
 function placePopover() {
-  const note = state.notes.find((c) => c.id === state.activePin);
+  const note = noteById(state.activePin);
   const rect = note?._el?.getBoundingClientRect();
   if (!rect) return hidePopover();
   const box = el.popover.getBoundingClientRect();
@@ -605,6 +624,10 @@ async function hydrate() {
   }
   for (const comment of pending) api.remove(comment.id).catch(() => {});
 
+  for (const comment of state.addressed) {
+    if (comment.anchor) comment._el = resolveAnchor(comment.anchor);
+  }
+
   if (state.addressed.length) state.open = true;
   refresh();
 }
@@ -647,16 +670,18 @@ export function mount() {
   root.addEventListener("mouseover", (e) => {
     const pin = e.target.closest?.('[data-act="pin"]');
     if (pin && state.activePin !== pin.dataset.id) showPopover(pin.dataset.id);
-    const item = e.target.closest?.(".item");
+    const item = e.target.closest?.(".item, .arow");
     if (item && state.hovered !== item.dataset.id) {
       state.hovered = item.dataset.id;
       syncHighlight();
     }
   });
-  el.list.addEventListener("mouseleave", () => {
+  const clearHover = () => {
     state.hovered = null;
     syncHighlight();
-  });
+  };
+  el.list.addEventListener("mouseleave", clearHover);
+  el.addressed.addEventListener("mouseleave", clearHover);
   el.popover.addEventListener("mouseleave", (e) => {
     if (!state.sticky && !e.relatedTarget?.closest?.(".pin")) hidePopover();
   });

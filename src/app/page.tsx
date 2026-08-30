@@ -50,8 +50,11 @@ export default function Home() {
           </span>
           <a
             href="https://github.com/AnalyticAce/webmark"
-            className="ml-auto text-[13px] text-paper-dim transition-colors duration-150 hover:text-acid"
+            className="ml-auto flex items-center gap-1.5 text-[13px] text-paper-dim transition-colors duration-150 hover:text-acid"
           >
+            <svg aria-hidden viewBox="0 0 16 16" width="16" height="16" fill="currentColor">
+              <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z" />
+            </svg>
             GitHub
           </a>
           <a
@@ -68,19 +71,19 @@ export default function Home() {
         <section className="mx-auto max-w-[1180px] px-6 pt-24 pb-20 md:pt-36">
           <p className="eyebrow rise">Dev only · Local only · No account</p>
 
-          <h1 className="rise mt-7 max-w-[16ch] font-display text-[clamp(3.25rem,9vw,6.75rem)] leading-[0.92] tracking-[-0.02em] text-balance [animation-delay:80ms]">
+          <h1 className="rise mt-7 mx-auto max-w-[16ch] font-display text-[clamp(3.25rem,9vw,6.75rem)] leading-[0.92] tracking-[-0.02em] text-balance text-center [animation-delay:80ms]">
             Point at what&apos;s wrong.{" "}
             <em className="text-acid italic">Your agent fixes it.</em>
           </h1>
 
-          <p className="rise mt-8 max-w-[54ch] text-[17px] leading-[1.7] text-paper-dim [animation-delay:160ms]">
+          <p className="rise mt-8 mx-auto max-w-[54ch] text-center text-[17px] leading-[1.7] text-paper-dim [animation-delay:160ms]">
             Your agent builds a page. You open it, click the headline, and type
             <span className="text-paper"> “this promise is vague.”</span> The comment lands in a
             file your agent reads — with the route, the component and the exact text you pointed
             at. It makes the change, and the pin disappears on its own.
           </p>
 
-          <div className="rise mt-11 flex flex-col items-start gap-4 sm:flex-row sm:items-center [animation-delay:240ms]">
+          <div className="rise mt-11 flex flex-col items-center gap-4 sm:flex-row sm:justify-center [animation-delay:240ms]">
             <CopyCommand command="npm i -D @dshalom/webmark && npx webmark init" />
             <a
               href="#how"

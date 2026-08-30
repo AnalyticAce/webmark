@@ -90,6 +90,11 @@ button:focus-visible, textarea:focus-visible { outline: 2px solid var(--accent);
   transition: transform .15s var(--ease);
 }
 .pin:hover, .pin.active { transform: scale(1.12); }
+/* Addressed: outlined rather than filled, so a finished note reads as finished at a glance. */
+.pin.done {
+  background: var(--panel-elev); color: var(--accent);
+  box-shadow: 0 0 0 1px var(--accent-border), var(--pin-shadow);
+}
 
 /* ---------- popover ---------- */
 .popover {
@@ -149,6 +154,21 @@ button:focus-visible, textarea:focus-visible { outline: 2px solid var(--accent);
 .addressed-head { display: flex; align-items: center; gap: 6px; font-size: 12.5px; font-weight: 600; }
 .addressed-head .tick { color: var(--accent); display: inline-flex; }
 .addressed li { margin-top: 6px; font-size: 12px; line-height: 1.45; color: var(--muted); }
+.addressed .arow {
+  display: grid; gap: 3px; padding: 6px 8px; margin-left: -8px;
+  border-radius: 8px; cursor: default; transition: background .15s var(--ease);
+}
+.addressed .arow:hover { background: var(--panel-elev); }
+/* What you asked, then what came back — showing only one of the two was the whole problem. */
+.ask { color: var(--faint); text-decoration: line-through; text-decoration-thickness: 1px; }
+.done-note { color: var(--muted); }
+.done-note::before { content: "↳ "; color: var(--accent); }
+.popover .done-head {
+  display: flex; align-items: center; gap: 6px; margin-bottom: 8px;
+  font-size: 12px; font-weight: 600; color: var(--accent);
+}
+.popover .ask { font-size: 13px; line-height: 1.5; }
+.popover .done-note { margin-top: 6px; font-size: 13px; line-height: 1.5; }
 .addressed li::marker { color: var(--faint); }
 .addressed ul { list-style: none; }
 
