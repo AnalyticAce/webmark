@@ -1,3 +1,10 @@
+# [1.2.0](https://github.com/AnalyticAce/webmark/compare/v1.1.0...v1.2.0) (2026-08-30)
+
+
+### Features
+
+* enhance anchor resolution and popover behavior; improve CSS path generation ([3be331b](https://github.com/AnalyticAce/webmark/commit/3be331b69f615e5e028a8711030ea75d07427d55))
+
 # [1.1.0](https://github.com/AnalyticAce/webmark/compare/v1.0.0...v1.1.0) (2026-08-30)
 
 
