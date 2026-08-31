@@ -1,3 +1,10 @@
+# [1.7.0](https://github.com/AnalyticAce/webmark/compare/v1.6.0...v1.7.0) (2026-08-30)
+
+
+### Features
+
+* add screenshot functionality for ProductShot using Chrome CDP ([ef26a7a](https://github.com/AnalyticAce/webmark/commit/ef26a7ae8ffe614f210059b4b3db2db41817c0cf))
+
 # [1.6.0](https://github.com/AnalyticAce/webmark/compare/v1.5.0...v1.6.0) (2026-08-30)
 
 
