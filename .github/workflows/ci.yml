@@ -51,6 +51,54 @@ jobs:
         run: npm pack --dry-run
         working-directory: packages/webmark
 
+  # Folded in from a separate workflow: it duplicated checkout + npm ci + a Next build on every
+  # push, and deployed even when verification failed. Gating on `verify` fixes both.
+  demo-site:
+    name: Demo site
+    needs: verify
+    if: github.event_name != 'pull_request'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read # a job-level block replaces the top-level one, so checkout needs this here
+      pages: write
+      id-token: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+
+      # NEXT_PUBLIC_WEBMARK_DEMO switches on the static export, the /webmark base path, and the
+      # widget itself — see next.config.ts.
+      - run: npm run build:demo
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: out
+
+  deploy-demo-site:
+    name: Deploy demo site
+    needs: demo-site
+    if: github.event_name != 'pull_request'
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    # One deploy at a time; a superseded run is worth cancelling.
+    concurrency:
+      group: pages
+      cancel-in-progress: true
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4
+
   release:
     name: Release
     needs: verify
