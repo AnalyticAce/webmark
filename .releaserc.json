@@ -6,27 +6,11 @@
     "@semantic-release/commit-analyzer",
     "@semantic-release/release-notes-generator",
     [
-      "@semantic-release/changelog",
-      {
-        "changelogFile": "packages/webmark/CHANGELOG.md"
-      }
-    ],
-    [
       "@semantic-release/npm",
       {
         "pkgRoot": "packages/webmark",
         "npmPublish": false,
         "tarballDir": "dist"
-      }
-    ],
-    [
-      "@semantic-release/git",
-      {
-        "assets": [
-          "packages/webmark/package.json",
-          "packages/webmark/CHANGELOG.md"
-        ],
-        "message": "chore(release): ${nextRelease.version} [skip ci]\n\n${nextRelease.notes}"
       }
     ],
     [

@@ -17,8 +17,6 @@
   },
   "devDependencies": {
     "@dshalom/webmark": "file:packages/webmark",
-    "@semantic-release/changelog": "^7.0.0",
-    "@semantic-release/git": "^11.0.1",
     "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
     "@types/react": "^19",
