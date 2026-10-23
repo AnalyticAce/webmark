@@ -9,28 +9,42 @@ export function storePath(root = process.cwd()) {
 }
 
 export async function read(root) {
+  let raw;
   try {
-    const raw = await readFile(storePath(root), "utf8");
+    raw = await readFile(storePath(root), "utf8");
+  } catch (err) {
+    if (err.code === "ENOENT") return []; // no comments yet
+    throw err;
+  }
+  try {
     const parsed = JSON.parse(raw);
     return Array.isArray(parsed?.comments) ? parsed.comments : [];
   } catch {
-    return []; // missing or unreadable file means no comments yet
+    // Never treat a corrupt file as empty: the next write would wipe every comment.
+    throw new Error(`webmark: ${storePath(root)} is not valid JSON — fix or delete it`);
   }
 }
+
+let writes = 0;
+let queue = Promise.resolve();
 
 export async function write(comments, root) {
   const file = storePath(root);
   await mkdir(dirname(file), { recursive: true });
   const body = JSON.stringify({ version: 1, comments }, null, 2) + "\n";
-  // Write-then-rename so a reader never sees a half-written file.
-  const tmp = `${file}.${process.pid}.tmp`;
+  // Write-then-rename so a reader never sees a half-written file. The temp name is unique per
+  // write: concurrent writes sharing one temp file interleave and leave a corrupt tail.
+  const tmp = `${file}.${process.pid}.${++writes}.tmp`;
   await writeFile(tmp, body, "utf8");
   await rename(tmp, file);
   return comments;
 }
 
-export async function update(root, fn) {
-  return write(await fn(await read(root)), root);
+/** Read-modify-write, serialized so concurrent requests can't drop each other's changes. */
+export function update(root, fn) {
+  const next = queue.then(async () => write(await fn(await read(root)), root));
+  queue = next.catch(() => {}); // one failed update must not block the ones after it
+  return next;
 }
 
 export function newId() {
