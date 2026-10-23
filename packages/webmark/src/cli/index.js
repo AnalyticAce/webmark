@@ -228,7 +228,12 @@ const commands = { init, eject, list, resolve };
 if (!command || command === "help" || command === "--help") {
   console.log(help);
 } else if (commands[command]) {
-  await commands[command](args);
+  try {
+    await commands[command](args);
+  } catch (err) {
+    console.error(err.message);
+    process.exitCode = 1;
+  }
 } else {
   console.error(`webmark: unknown command "${command}"\n`);
   console.log(help);

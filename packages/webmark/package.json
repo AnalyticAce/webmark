@@ -38,6 +38,9 @@
     },
     "./package.json": "./package.json"
   },
+  "scripts": {
+    "test": "node --test src"
+  },
   "files": [
     "src",
     "README.md",
