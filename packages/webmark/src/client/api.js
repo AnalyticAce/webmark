@@ -17,7 +17,7 @@ async function resolveBase() {
       // port not listening — try the next one
     }
   }
-  throw new Error("webmark: comment server not reachable");
+  throw new Error("webmark: comment server not reachable — restart the dev server after installing");
 }
 
 async function call(path, options) {
