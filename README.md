@@ -21,12 +21,15 @@ cannot reach a production build.
 Requires **Next.js 15.3+** (App Router) and **Node 20+**.
 
 ```bash
-npm i -D https://github.com/AnalyticAce/webmark/releases/latest/download/webmark.tgz && npx webmark init
+echo allow-remote=root >> .npmrc && npm i -D https://github.com/AnalyticAce/webmark/releases/latest/download/webmark.tgz && npx webmark init
 ```
 
 webmark ships from [GitHub Releases](https://github.com/AnalyticAce/webmark/releases), not
 the npm registry. The command above takes the latest release; to pin one, swap `latest` for its
-tag — `…/releases/download/v1.7.0/webmark.tgz`. To upgrade, run the install again.
+tag — `…/releases/download/v1.7.1/webmark.tgz`. To upgrade, run the install again.
+
+The `.npmrc` line is for npm 12+, which refuses tarball URLs by default. `root` allows them for
+your own direct dependencies only; commit the file so `npm ci` works on fresh clones and CI.
 
 Restart your dev server. A dark pill appears in the bottom-right corner.
 
