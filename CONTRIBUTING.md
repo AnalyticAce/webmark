@@ -34,8 +34,8 @@ rm -rf .next node_modules && npm ci
 
 ## Releasing
 
-[semantic-release](https://semantic-release.gitbook.io/) owns versioning, tagging, the changelog,
-the GitHub release, and the npm publish. Never edit a version number or write a tag by hand —
+[semantic-release](https://semantic-release.gitbook.io/) owns versioning, tagging, release notes,
+and the GitHub release. Never edit a version number or write a tag by hand —
 `packages/webmark/package.json` says `0.0.0-development` on purpose, because the git tags are the
 source of truth.
 
@@ -46,9 +46,10 @@ source of truth.
 | `feat!: …` or a `BREAKING CHANGE:` footer | major |
 | `docs`, `chore`, `ci`, `test`, `refactor`, `style` | no release |
 
-Push to `main`, CI verifies, then semantic-release bumps the manifest, writes
-`packages/webmark/CHANGELOG.md`, commits both as `chore(release): X.Y.Z [skip ci]`, tags it,
-opens a GitHub release, and attaches the packed tarball to it as `webmark.tgz`. Nothing is
+Push to `main`, CI verifies, then semantic-release stamps the version into the packed manifest,
+tags it, opens a GitHub release with the notes, and attaches the tarball to it as `webmark.tgz`.
+It never commits back: `main` requires signed commits through pull requests, which a bot push
+cannot satisfy, so release notes live on GitHub Releases and `CHANGELOG.md` stops at 1.7.1. Nothing is
 published to npm — users install straight from the release URL. Config lives in [`.releaserc.json`](.releaserc.json).
 
 Preview what the next push would ship — no guessing:
@@ -68,7 +69,7 @@ must stay public: `releases/latest/download/webmark.tgz` is fetched by `npm` wit
 
 ### If a release fails partway
 
-semantic-release commits and tags **before** it uploads, so a failed upload leaves a tag (or a
+semantic-release tags **before** it uploads, so a failed upload leaves a tag (or a
 release with no `webmark.tgz`) claiming a version nobody can install. Recovery is always the same: delete the tag, fix the
 cause, push again.
 
