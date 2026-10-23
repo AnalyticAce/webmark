@@ -39,7 +39,7 @@
     "./package.json": "./package.json"
   },
   "scripts": {
-    "test": "node --test src"
+    "test": "node --test \"src/**/*.test.js\""
   },
   "files": [
     "src",
