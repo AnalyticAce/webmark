@@ -220,6 +220,8 @@ function renderPins() {
 function positionPins() {
   for (const pin of el.pins.children) {
     const note = noteById(pin.dataset.id);
+    // Re-find elements that were missing or re-rendered (after login, a fetch, a re-mount).
+    if (note?.anchor && !note._el?.isConnected) note._el = resolveAnchor(note.anchor);
     const rect = note?._el?.getBoundingClientRect();
     if (!rect || (!rect.width && !rect.height)) {
       pin.hidden = true;
@@ -568,8 +570,9 @@ function onKey(e) {
 
 /**
  * Rebuild this page's pins from the store.
- * A comment survives only while it is unresolved AND the thing it points at still renders;
- * anything else is dropped, which is what makes the agent's edits clean up after themselves.
+ * Open comments are never collected here: only `webmark resolve` (or the reviewer) closes one.
+ * A missing element is not proof the work is done — a logged-out visit, another viewport or a
+ * list still loading all hide it — so such a comment stays listed, pinless, until it reappears.
  */
 async function hydrate() {
   let all;
@@ -595,24 +598,20 @@ async function hydrate() {
       comment.anchor = { ...comment.anchor, selector };
       api.patch(comment.id, { anchor: comment.anchor }).catch(() => {});
     }
-    state.notes.push(comment);
   };
 
   const pending = [];
   for (const comment of open.filter((c) => c.route === route)) {
-    if (!comment.anchor) {
-      state.notes.push(comment);
-      continue;
-    }
+    state.notes.push(comment);
+    if (!comment.anchor) continue;
     const node = resolveAnchor(comment.anchor);
     if (node) attach(comment, node);
     else pending.push(comment);
   }
   refresh();
 
-  // Anything still unresolved gets a grace period before it is collected. We can run before the
-  // app has rendered, and an element that is not on the page *yet* is not an element the agent
-  // deleted — without this, one slow first paint drops every comment on the route.
+  // We can run before the app has rendered: give a slow first paint a moment to produce the pins.
+  // Whatever is still missing stays listed; positionPins keeps looking for it.
   for (let attempt = 0; attempt < 6 && pending.length; attempt++) {
     await new Promise((done) => setTimeout(done, 250));
     for (let i = pending.length - 1; i >= 0; i--) {
@@ -622,7 +621,6 @@ async function hydrate() {
       pending.splice(i, 1);
     }
   }
-  for (const comment of pending) api.remove(comment.id).catch(() => {});
 
   for (const comment of state.addressed) {
     if (comment.anchor) comment._el = resolveAnchor(comment.anchor);
