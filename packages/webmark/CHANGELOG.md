@@ -1,3 +1,10 @@
+## [1.7.1](https://github.com/AnalyticAce/webmark/compare/v1.7.0...v1.7.1) (2026-10-23)
+
+
+### Bug Fixes
+
+* ship from GitHub Releases instead of npm; purge forged commits ([cd62946](https://github.com/AnalyticAce/webmark/commit/cd629462254a957e389403f10758d9c9063f5233))
+
 # [1.7.0](https://github.com/AnalyticAce/webmark/compare/v1.6.0...v1.7.0) (2026-08-30)
 
 
