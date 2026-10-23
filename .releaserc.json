@@ -14,7 +14,9 @@
     [
       "@semantic-release/npm",
       {
-        "pkgRoot": "packages/webmark"
+        "pkgRoot": "packages/webmark",
+        "npmPublish": false,
+        "tarballDir": "dist"
       }
     ],
     [
@@ -34,7 +36,14 @@
         "failComment": false,
         "failTitle": false,
         "labels": false,
-        "releasedLabels": false
+        "releasedLabels": false,
+        "assets": [
+          {
+            "path": "dist/*.tgz",
+            "name": "webmark.tgz",
+            "label": "webmark.tgz"
+          }
+        ]
       }
     ]
   ]

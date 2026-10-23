@@ -47,3 +47,9 @@ graphify-out/
 
 # webmark review comments (local only)
 .webmark/
+
+# release tarball (attached to GitHub releases)
+dist/
+
+# compiled python (unauditable binaries; never commit)
+__pycache__/

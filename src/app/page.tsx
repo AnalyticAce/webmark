@@ -58,7 +58,7 @@ export default function Home() {
             GitHub
           </a>
           <a
-            href="https://www.npmjs.com/package/@dshalom/webmark"
+            href="https://github.com/AnalyticAce/webmark/releases"
             className="flex items-center gap-1.5 text-[13px] text-paper-dim transition-colors duration-150 hover:text-acid"
           >
             <svg aria-hidden viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round">
@@ -66,7 +66,7 @@ export default function Home() {
               <polyline points="3.27 6.96 12 12.01 20.73 6.96"/>
               <line x1="12" y1="22.08" x2="12" y2="12"/>
             </svg>
-            npm
+            Releases
           </a>
         </nav>
       </header>
@@ -89,7 +89,7 @@ export default function Home() {
           </p>
 
           <div className="rise mt-11 flex flex-col items-center gap-4 [animation-delay:240ms]">
-            <CopyCommand command="npm i -D @dshalom/webmark && npx webmark init" />
+            <CopyCommand command="npm i -D https://github.com/AnalyticAce/webmark/releases/latest/download/webmark.tgz && npx webmark init" />
             <a
               href="#how"
               className="text-[14px] text-paper-dim underline decoration-rule underline-offset-[6px] transition-colors duration-150 hover:text-acid hover:decoration-acid-deep"
@@ -217,7 +217,7 @@ export default function Home() {
               Stop describing the bug. <em className="text-acid italic">Point at it.</em>
             </h2>
             <div className="mt-12 flex justify-center">
-              <CopyCommand command="npm i -D @dshalom/webmark && npx webmark init" />
+              <CopyCommand command="npm i -D https://github.com/AnalyticAce/webmark/releases/latest/download/webmark.tgz && npx webmark init" />
             </div>
             <p className="mt-6 text-[13px] text-paper-faint">
               Requires Next.js 15.3+ (App Router) and Node 20+. Uninstall with{" "}
@@ -240,7 +240,7 @@ export default function Home() {
             Source
           </a>
           <a
-            href="https://www.npmjs.com/package/@dshalom/webmark"
+            href="https://github.com/AnalyticAce/webmark/releases"
             className="transition-colors duration-150 hover:text-acid"
           >
             Package

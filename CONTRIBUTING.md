@@ -48,7 +48,8 @@ source of truth.
 
 Push to `main`, CI verifies, then semantic-release bumps the manifest, writes
 `packages/webmark/CHANGELOG.md`, commits both as `chore(release): X.Y.Z [skip ci]`, tags it,
-publishes to npm, and opens a GitHub release. Config lives in [`.releaserc.json`](.releaserc.json).
+opens a GitHub release, and attaches the packed tarball to it as `webmark.tgz`. Nothing is
+published to npm — users install straight from the release URL. Config lives in [`.releaserc.json`](.releaserc.json).
 
 Preview what the next push would ship — no guessing:
 
@@ -62,23 +63,13 @@ fixture app — semantic-release has no path filter. Keep non-package work under
 
 ### Publishing credentials
 
-CI publishes through **npm trusted publishing**: GitHub Actions mints an OIDC token, npm
-exchanges it for a short-lived publish token, and nothing long-lived lives in the repo. It also
-works with 2FA set to *auth-and-writes*, which no static token can satisfy.
-
-It's already configured. If you ever set it up again from scratch, the order matters:
-
-1. Publish once by hand — the OIDC exchange endpoint is package-scoped, so the package must
-   exist before a trusted publisher can be attached to it.
-2. On npmjs.com → the package → Settings → Trusted Publisher → GitHub Actions, pointing at this
-   repository and `ci.yml`.
-3. Grant `id-token: write` to the release job, and delete any `NPM_TOKEN` secret once a release
-   has gone through on OIDC.
+None beyond the workflow's own `GITHUB_TOKEN` (`contents: write` on the release job). The repo
+must stay public: `releases/latest/download/webmark.tgz` is fetched by `npm` without auth.
 
 ### If a release fails partway
 
-semantic-release commits and tags **before** it publishes, so a failed upload leaves a tag
-claiming a version that npm doesn't have. Recovery is always the same: delete the tag, fix the
+semantic-release commits and tags **before** it uploads, so a failed upload leaves a tag (or a
+release with no `webmark.tgz`) claiming a version nobody can install. Recovery is always the same: delete the tag, fix the
 cause, push again.
 
 ```bash

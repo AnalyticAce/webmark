@@ -105,10 +105,9 @@ jobs:
     if: github.event_name != 'pull_request'
     runs-on: ubuntu-latest
     permissions:
-      contents: write # commit the version bump, push the tag, create the GitHub release
+      contents: write # commit the version bump, push the tag, create the release + upload the tarball
       issues: write # comment on issues closed by a release
       pull-requests: write
-      id-token: write # npm trusted publishing: exchange an OIDC token for a publish token
     steps:
       - uses: actions/checkout@v4
         with:
@@ -122,10 +121,8 @@ jobs:
 
       - run: npm ci
 
-      # @semantic-release/npm tries OIDC first and only falls back to NPM_TOKEN, so once the
-      # package has a trusted publisher on npmjs.com the secret can be deleted.
+      # Not published to npm: the packed tarball is attached to the GitHub release as webmark.tgz.
       - name: Release
         run: npx semantic-release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
