@@ -89,7 +89,7 @@ export default function Home() {
           </p>
 
           <div className="rise mt-11 flex flex-col items-center gap-4 [animation-delay:240ms]">
-            <CopyCommand command="npm i -D https://github.com/AnalyticAce/webmark/releases/latest/download/webmark.tgz && npx webmark init" />
+            <CopyCommand command="echo allow-remote=root >> .npmrc && npm i -D https://github.com/AnalyticAce/webmark/releases/latest/download/webmark.tgz && npx webmark init" />
             <a
               href="#how"
               className="text-[14px] text-paper-dim underline decoration-rule underline-offset-[6px] transition-colors duration-150 hover:text-acid hover:decoration-acid-deep"
@@ -217,7 +217,7 @@ export default function Home() {
               Stop describing the bug. <em className="text-acid italic">Point at it.</em>
             </h2>
             <div className="mt-12 flex justify-center">
-              <CopyCommand command="npm i -D https://github.com/AnalyticAce/webmark/releases/latest/download/webmark.tgz && npx webmark init" />
+              <CopyCommand command="echo allow-remote=root >> .npmrc && npm i -D https://github.com/AnalyticAce/webmark/releases/latest/download/webmark.tgz && npx webmark init" />
             </div>
             <p className="mt-6 text-[13px] text-paper-faint">
               Requires Next.js 15.3+ (App Router) and Node 20+. Uninstall with{" "}

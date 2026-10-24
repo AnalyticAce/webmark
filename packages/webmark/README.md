@@ -4,7 +4,7 @@ Point-and-comment review layer for the page your coding agent just built. Dev-on
 no account, no server to run.
 
 ```bash
-npm i -D https://github.com/AnalyticAce/webmark/releases/latest/download/webmark.tgz && npx webmark init
+echo allow-remote=root >> .npmrc && npm i -D https://github.com/AnalyticAce/webmark/releases/latest/download/webmark.tgz && npx webmark init
 ```
 
 Restart the dev server. A pill appears bottom-right — press `C` for a note, `T` to pick an
