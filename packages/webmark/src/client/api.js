@@ -25,7 +25,10 @@ async function call(path, options) {
     headers: { "content-type": "application/json" },
     ...options,
   });
-  if (!res.ok && res.status !== 204) throw new Error(`webmark: ${res.status}`);
+  if (!res.ok && res.status !== 204) {
+    const reason = await res.json().then((b) => b?.error).catch(() => null);
+    throw new Error(reason ?? `webmark: ${res.status}`);
+  }
   return res.status === 204 ? null : res.json();
 }
 

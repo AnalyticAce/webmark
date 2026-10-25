@@ -190,6 +190,7 @@ textarea:focus { outline: none; background: var(--field-focus); border-color: va
 .compose-foot { display: flex; align-items: center; gap: 8px; margin-top: 8px; }
 .hint { font-size: 11.5px; color: var(--faint); }
 .hint code { font-family: var(--mono); }
+.hint.error { color: var(--danger); }
 .ghost {
   height: 32px; padding: 0 12px; border-radius: 999px; font-size: 13px; font-weight: 500;
   color: var(--muted); transition: background .15s var(--ease), color .15s var(--ease);

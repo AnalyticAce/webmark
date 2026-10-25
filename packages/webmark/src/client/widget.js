@@ -56,7 +56,7 @@ function template() {
           <label class="sr-only" for="webmark-note" hidden>Comment</label>
           <textarea id="webmark-note" placeholder="Describe the issue or idea…" rows="3"></textarea>
           <div class="compose-foot">
-            <span class="hint"><code>⌘↵</code> to save</span>
+            <span class="hint compose-hint" role="status"></span>
             <span class="spacer"></span>
             <button class="ghost" data-act="cancel">Cancel</button>
             <button class="primary" data-act="save">Save</button>
@@ -330,6 +330,7 @@ function compose(draft, body = "") {
   state.open = true;
   hidePopover();
   el.textarea.value = body;
+  setHint();
   syncPanel();
   el.textarea.focus();
   requestAnimationFrame(() => el.textarea.focus());
@@ -349,6 +350,7 @@ async function save() {
   const text = el.textarea.value.trim();
   if (!text || !state.draft) return;
   const { id, anchor, node } = state.draft;
+  setHint();
   try {
     if (id) {
       const updated = await api.patch(id, { text });
@@ -367,7 +369,10 @@ async function save() {
       state.notes.push(created);
     }
   } catch (err) {
+    // Keep the draft so the text is not lost; say why in the composer.
     console.warn("[webmark] could not save comment:", err.message);
+    setHint(`Not saved — ${err.message.replace(/^webmark: /, "")}`);
+    return;
   }
   state.draft = null;
   el.textarea.value = "";
@@ -402,6 +407,11 @@ async function copyForAgent() {
   } catch {
     flashFooter(".webmark/comments.json");
   }
+}
+
+function setHint(error) {
+  el.hint.classList.toggle("error", !!error);
+  el.hint.innerHTML = error ? esc(error) : "<code>⌘↵</code> to save";
 }
 
 function flashFooter(message) {
@@ -660,6 +670,7 @@ export function mount() {
     others: $(".others"),
     footer: $(".footer"),
     chip: $(".chip"),
+    hint: $(".compose-hint"),
     textarea: $("textarea"),
     save: $('[data-act="save"]'),
   };
